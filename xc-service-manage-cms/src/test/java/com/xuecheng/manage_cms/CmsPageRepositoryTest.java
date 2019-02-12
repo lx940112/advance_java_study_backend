@@ -36,6 +36,36 @@ public class CmsPageRepositoryTest {
     }
 
     @Test
+    public void testFindAllByExample(){
+        // 分页参数
+        int page = 0; // 从0开始
+        int size = 10;
+        Pageable pageable = PageRequest.of(page, size);
+        // 条件查询参数
+
+        //页面别名模糊查询，需要自定义字符串的匹配器实现模糊查询
+        //ExampleMatcher.GenericPropertyMatchers.contains()  包含
+        //ExampleMatcher.GenericPropertyMatchers.startsWith()  开头匹配
+        //条件值
+        CmsPage cmsPage = new CmsPage();
+        //站点ID
+//        cmsPage.setSiteId("5a751fab6abb5044e0d19ea1");
+        //模板ID
+//        cmsPage.setTemplateId("5a962c16b00ffc514038fafd");
+        cmsPage.setPageAliase("分类");
+
+
+        //条件匹配器
+        ExampleMatcher exampleMatcher = ExampleMatcher.matching();
+        exampleMatcher = exampleMatcher.withMatcher("pageAliase", ExampleMatcher.GenericPropertyMatchers.contains());
+        //创建条件实例
+        Example<CmsPage> example = Example.of(cmsPage, exampleMatcher);
+        Page<CmsPage> all = cmsPageRepository.findAll(example, pageable);
+        String s = JSONObject.toJSONString(all);
+        System.out.printf(s);
+    }
+
+    @Test
     public void testInsert() {
         // 定义实体类
         CmsPage cmsPage = new CmsPage();
