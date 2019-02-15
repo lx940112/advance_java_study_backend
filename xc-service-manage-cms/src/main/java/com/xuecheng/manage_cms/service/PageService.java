@@ -2,6 +2,7 @@ package com.xuecheng.manage_cms.service;
 
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
+import com.xuecheng.framework.domain.cms.response.CmsPageResult;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.QueryResult;
@@ -10,6 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class PageService {
@@ -49,12 +52,13 @@ public class PageService {
 
     /**
      * 页面列表分页查询
-     * @param page 当前页码
-     * @param size 页面显示个数
+     *
+     * @param page             当前页码
+     * @param size             页面显示个数
      * @param queryPageRequest 查询条件
      * @return 页面列表
      */
-    public QueryResponseResult findList(int page,int size,QueryPageRequest queryPageRequest){
+    public QueryResponseResult findList(int page, int size, QueryPageRequest queryPageRequest) {
         //条件匹配器
         //页面名称模糊查询，需要自定义字符串的匹配器实现模糊查询
         ExampleMatcher exampleMatcher = ExampleMatcher.matching()
@@ -62,30 +66,93 @@ public class PageService {
         //条件值
         CmsPage cmsPage = new CmsPage();
         //站点ID
-        if(StringUtils.isNotEmpty(queryPageRequest.getSiteId())){
+        if (StringUtils.isNotEmpty(queryPageRequest.getSiteId())) {
             cmsPage.setSiteId(queryPageRequest.getSiteId());
         }
         //模板ID
-        if(StringUtils.isNotEmpty(queryPageRequest.getTemplateId())){
+        if (StringUtils.isNotEmpty(queryPageRequest.getTemplateId())) {
             cmsPage.setTemplateId(queryPageRequest.getTemplateId());
         }
         //页面别名
-        if(StringUtils.isNotEmpty(queryPageRequest.getPageAliase())){
+        if (StringUtils.isNotEmpty(queryPageRequest.getPageAliase())) {
             cmsPage.setPageAliase(queryPageRequest.getPageAliase());
         }
         //创建条件实例
         Example<CmsPage> example = Example.of(cmsPage, exampleMatcher);
         //页码
-        page = page-1;
+        page = page - 1;
         //分页对象
         Pageable pageable = new PageRequest(page, size);
         //分页查询
-        Page<CmsPage> all = cmsPageRepository.findAll(example,pageable);
+        Page<CmsPage> all = cmsPageRepository.findAll(example, pageable);
         QueryResult<CmsPage> cmsPageQueryResult = new QueryResult<CmsPage>();
         cmsPageQueryResult.setList(all.getContent());
         cmsPageQueryResult.setTotal(all.getTotalElements());
         //返回结果
-        return new QueryResponseResult(CommonCode.SUCCESS,cmsPageQueryResult);
+        return new QueryResponseResult(CommonCode.SUCCESS, cmsPageQueryResult);
+    }
+
+    /**
+     * 新增页面
+     *
+     * @param cmsPage
+     * @return CmsPageResult
+     */
+    public CmsPageResult add(CmsPage cmsPage) {
+        // 校验页面名称、站点ID、页面webPath的唯一性
+        // 根据页面名称、站点ID、页面webPath去查询cms_page集合，如果查到说明此页面已经存在，如果查询不到再继续添加
+        CmsPage oldPage = cmsPageRepository.findByPageNameAndSiteIdAndPageWebPath(cmsPage.getPageName(), cmsPage.getSiteId(), cmsPage.getPageWebPath());
+        if (oldPage == null) {
+            cmsPage.setPageId(null);
+            // 调用dao新增页面
+            CmsPage newPage = cmsPageRepository.save(cmsPage);
+            return new CmsPageResult(CommonCode.SUCCESS, newPage);
+        }
+        // 添加失败
+        return new CmsPageResult(CommonCode.FAIL, null);
+    }
+
+    /**
+     * 根据ID查询页面
+     *
+     * @param id
+     * @return CmsPage
+     */
+    public CmsPage getPageById(String id) {
+        Optional<CmsPage> cmsPage = cmsPageRepository.findById(id);
+        return cmsPage.orElse(null);
+    }
+
+    /**
+     * 修改页面
+     *
+     * @param id
+     * @param cmsPage
+     * @return CmsPageResult
+     */
+    public CmsPageResult update(String id, CmsPage cmsPage) {
+        //根据id查询页面信息
+        CmsPage oldPage = getPageById(id);
+        if (oldPage != null) {
+            //更新模板id
+            oldPage.setTemplateId(cmsPage.getTemplateId());
+            //更新所属站点
+            oldPage.setSiteId(cmsPage.getSiteId());
+            //更新页面别名
+            oldPage.setPageAliase(cmsPage.getPageAliase());
+            //更新页面名称
+            oldPage.setPageName(cmsPage.getPageName());
+            //更新访问路径
+            oldPage.setPageWebPath(cmsPage.getPageWebPath());
+            //更新物理路径
+            oldPage.setPagePhysicalPath(cmsPage.getPagePhysicalPath());
+            CmsPage newPage = cmsPageRepository.save(oldPage);
+            if (newPage != null) {
+                // 返回成功
+                return new CmsPageResult(CommonCode.SUCCESS, newPage);
+            }
+        }
+        return new CmsPageResult(CommonCode.FAIL, null);
     }
 
 
