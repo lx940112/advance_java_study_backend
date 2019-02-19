@@ -17,10 +17,14 @@ import java.util.Optional;
 @Service
 public class PageService {
 
-    @Autowired
-    CmsPageRepository cmsPageRepository;
+    private final CmsPageRepository cmsPageRepository;
 
-    /**
+    @Autowired
+    public PageService(CmsPageRepository cmsPageRepository) {
+        this.cmsPageRepository = cmsPageRepository;
+    }
+
+    /*
      * 页面列表分页查询
      * @param page
      * @param size
@@ -82,10 +86,10 @@ public class PageService {
         //页码
         page = page - 1;
         //分页对象
-        Pageable pageable = new PageRequest(page, size);
+        Pageable pageable = PageRequest.of(page, size);
         //分页查询
         Page<CmsPage> all = cmsPageRepository.findAll(example, pageable);
-        QueryResult<CmsPage> cmsPageQueryResult = new QueryResult<CmsPage>();
+        QueryResult<CmsPage> cmsPageQueryResult = new QueryResult<>();
         cmsPageQueryResult.setList(all.getContent());
         cmsPageQueryResult.setTotal(all.getTotalElements());
         //返回结果
@@ -147,10 +151,8 @@ public class PageService {
             //更新物理路径
             oldPage.setPagePhysicalPath(cmsPage.getPagePhysicalPath());
             CmsPage newPage = cmsPageRepository.save(oldPage);
-            if (newPage != null) {
-                // 返回成功
-                return new CmsPageResult(CommonCode.SUCCESS, newPage);
-            }
+            // 返回成功
+            return new CmsPageResult(CommonCode.SUCCESS, newPage);
         }
         return new CmsPageResult(CommonCode.FAIL, null);
     }
