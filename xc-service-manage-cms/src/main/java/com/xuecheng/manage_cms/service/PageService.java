@@ -2,10 +2,13 @@ package com.xuecheng.manage_cms.service;
 
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
+import com.xuecheng.framework.domain.cms.response.CmsCode;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.QueryResult;
+import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_cms.dao.CmsPageRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,6 +109,12 @@ public class PageService {
         // 校验页面名称、站点ID、页面webPath的唯一性
         // 根据页面名称、站点ID、页面webPath去查询cms_page集合，如果查到说明此页面已经存在，如果查询不到再继续添加
         CmsPage oldPage = cmsPageRepository.findByPageNameAndSiteIdAndPageWebPath(cmsPage.getPageName(), cmsPage.getSiteId(), cmsPage.getPageWebPath());
+        if(oldPage != null){
+            //校验页面是否存在，已存在则抛出异常
+            ExceptionCast.cast(CmsCode.CMS_ADDPAGE_EXISTSNAME);
+        }
+
+
         if (oldPage == null) {
             cmsPage.setPageId(null);
             // 调用dao新增页面
@@ -157,5 +166,18 @@ public class PageService {
         return new CmsPageResult(CommonCode.FAIL, null);
     }
 
-
+    /**
+     * 通过ID删除页面
+     *
+     * @param id
+     * @return ResponseResult
+     */
+    public ResponseResult delete(String id) {
+        CmsPage oldPage = getPageById(id);
+        if (oldPage != null) {
+            cmsPageRepository.deleteById(id);
+            return new ResponseResult(CommonCode.SUCCESS);
+        }
+        return new ResponseResult(CommonCode.FAIL);
+    }
 }
