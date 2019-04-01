@@ -90,4 +90,14 @@ public class CmsPageController implements CmsPageControllerApi {
     public ResponseResult delete(@PathVariable("id") String id) {
         return pageService.delete(id);
     }
+
+    /**
+     * 查询站点列表信息
+     * @return
+     */
+    @Override
+    @GetMapping("getSiteList")
+    public QueryResponseResult getSiteList() {
+        return pageService.getSiteList();
+    }
 }

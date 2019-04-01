@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -179,5 +180,14 @@ public class PageService {
             return new ResponseResult(CommonCode.SUCCESS);
         }
         return new ResponseResult(CommonCode.FAIL);
+    }
+
+    public QueryResponseResult getSiteList() {
+        List<CmsPage> all = cmsPageRepository.findAll();
+        QueryResult<CmsPage> cmsPageQueryResult = new QueryResult<>();
+        cmsPageQueryResult.setList(all);
+        cmsPageQueryResult.setTotal(all.size());
+        //返回结果
+        return new QueryResponseResult(CommonCode.SUCCESS, cmsPageQueryResult);
     }
 }

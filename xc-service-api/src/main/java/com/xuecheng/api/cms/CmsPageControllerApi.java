@@ -66,4 +66,12 @@ public interface CmsPageControllerApi {
     @ApiOperation("通过ID删除页面")
     ResponseResult delete(String id);
 
+    /**
+     * 查询站点列表信息
+     * @return
+     */
+    @ApiOperation("查询站点列表信息")
+    public QueryResponseResult getSiteList();
+
+
 }
