@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Lucas
+ */
 @Service
 public class PageService {
 
@@ -27,36 +30,6 @@ public class PageService {
     public PageService(CmsPageRepository cmsPageRepository) {
         this.cmsPageRepository = cmsPageRepository;
     }
-
-    /*
-     * 页面列表分页查询
-     * @param page
-     * @param size
-     * @param queryPageRequest
-     * @return QueryResponseResult
-     */
-    /*public QueryResponseResult findList(int page, int size, QueryPageRequest queryPageRequest) {
-        if (queryPageRequest == null) {
-            queryPageRequest = new QueryPageRequest();
-        }
-        if (page <= 0) {
-            page = 1;
-        }
-        page = page - 1;//为了适应MongoDB的接口将页码减一
-        if (size <= 0) {
-            size = 20;
-        }
-        // 分页对象
-        Pageable pageable = PageRequest.of(page, size);
-        // 分页查询
-        Page<CmsPage> all = cmsPageRepository.findAll(pageable);
-        QueryResult<CmsPage> cmsPageQueryResult = new QueryResult<>();
-        cmsPageQueryResult.setList(all.getContent());
-        cmsPageQueryResult.setTotal(all.getTotalElements());
-        //返回结果
-        return new QueryResponseResult(CommonCode.SUCCESS, cmsPageQueryResult);
-    }*/
-
 
     /**
      * 页面列表分页查询
@@ -114,16 +87,10 @@ public class PageService {
             //校验页面是否存在，已存在则抛出异常
             ExceptionCast.cast(CmsCode.CMS_ADDPAGE_EXISTSNAME);
         }
-
-
-        if (oldPage == null) {
-            cmsPage.setPageId(null);
-            // 调用dao新增页面
-            CmsPage newPage = cmsPageRepository.save(cmsPage);
-            return new CmsPageResult(CommonCode.SUCCESS, newPage);
-        }
-        // 添加失败
-        return new CmsPageResult(CommonCode.FAIL, null);
+        cmsPage.setPageId(null);
+        // 调用dao新增页面
+        CmsPage newPage = cmsPageRepository.save(cmsPage);
+        return new CmsPageResult(CommonCode.SUCCESS, newPage);
     }
 
     /**

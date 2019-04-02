@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * @author Lucas
+ */
 @Service
 public class CmsConfigService {
     private final CmsConfigRepository cmsConfigRepository;

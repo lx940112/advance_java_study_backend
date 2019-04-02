@@ -9,12 +9,11 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @SpringBootTest
@@ -23,6 +22,22 @@ public class CmsPageRepositoryTest {
 
     @Autowired
     CmsPageRepository cmsPageRepository;
+
+    @Autowired
+    RestTemplate restTemplate;
+
+
+    @Test
+    public void testRestTemplate(){
+        ResponseEntity<Map> forEntity = restTemplate.getForEntity("http://localhost:31001/cms/config/getModel/5a791725dd573c3574ee333f", Map.class);
+        System.out.println(forEntity);
+    }
+
+
+
+
+
+
 
     @Test
     public void testFindPage() {
@@ -62,7 +77,7 @@ public class CmsPageRepositoryTest {
         Example<CmsPage> example = Example.of(cmsPage, exampleMatcher);
         Page<CmsPage> all = cmsPageRepository.findAll(example, pageable);
         String s = JSONObject.toJSONString(all);
-        System.out.printf(s);
+        System.out.println(s);
     }
 
     @Test
