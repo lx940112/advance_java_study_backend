@@ -7,7 +7,7 @@
 <body>
 Hello ${name}!
 <br/>
-<table>
+<#--<table>
     <tr>
         <td>序号</td>
         <td>姓名</td>
@@ -78,7 +78,7 @@ Hello ${name}!
             </tr>
         </#list>
     </#if>
-</table>
+</table>-->
 <br/>
 <#assign text="{'bank':'工商银行','account':'10101920201920212'}" />
 <#assign data=text?eval />

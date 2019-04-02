@@ -7,8 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Lucas
  */
 @SpringBootApplication
-public class FreemarkerTestApplication {
+public class FreemarkerTest {
     public static void main(String[] args) {
-        SpringApplication.run(FreemarkerTestApplication.class,args);
+        SpringApplication.run(FreemarkerTest.class,args);
     }
 }
